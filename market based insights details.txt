@@ -1,0 +1,52 @@
+The code starts by importing the necessary libraries:
+
+```python
+import pandas as pd
+from mlxtend.frequent_patterns import apriori, association_rules
+```
+
+It sets some Pandas display options to view all columns and rows.
+
+```python
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.width', 500)
+```
+
+Then, it reads an Excel file called "Assignment-1_Data.xlsx" from Kaggle into a Pandas DataFrame:
+
+```python
+df = pd.read_excel("/kaggle/input/market-basket-analysis/Assignment-1_Data.xlsx")
+`
+
+The code defines two functions:
+
+1. `outlier_thresholds`: This function calculates lower and upper limits for identifying outliers based on the interquartile range.
+2. `replace_with_thresholds`: This function replaces outliers in a DataFrame with the computed lower and upper limits.
+
+A third function, `retail_data_prep`, is defined to preprocess the data:
+
+- It filters out rows where "Quantity" and "Price" are greater than 0.
+- It calls `replace_with_thresholds` to replace outliers in "Quantity" and "Price."
+- It returns the preprocessed DataFrame.
+
+The main DataFrame `df` is then updated to contain the preprocessed data:
+
+```python
+df = retail_data_prep(df)
+```
+
+The code provides a summary of the preprocessed data using the `describe` function, which displays statistics for each column in the DataFrame. It prints statistics like count, mean, min, 25th percentile, median (50th percentile), 75th percentile, max, and standard deviation for columns "Quantity," "Date," "Price," and "CustomerID."
+
+
+This part of the code focuses on market basket analysis, specifically for transactions in France ("df_fr"). Here's a breakdown of the steps:
+
+- `df_fr` is created by filtering the data to retain only transactions from France.
+
+- The code groups the data in `df_fr` by "BillNo" and "Itemname" and calculates the sum of "Quantity" for each item in each transaction. It then reshapes the result into a table with "BillNo" as the index and "Itemname" as columns, filling in missing values with zeros. This creates a transaction-item matrix.
+
+- The transaction-item matrix is further transformed into a binary format, where 1 indicates the presence of an item in a transaction and 0 indicates its absence. This is done using `applymap` with a lambda function that checks if the quantity is greater than 0.
+
+- Market basket analysis is performed using the Apriori algorithm from mlxtend. Frequent itemsets are generated with a minimum support of 0.01 (1%) and using item names as column labels.
+
+- The frequent itemsets are sorted by support in descending order, and the top 5 are displayed. Each itemset shows the support (percentage of transactions containing that itemset) and the itemset itself, e.g., (("Quantity", "POSTAGE")).
